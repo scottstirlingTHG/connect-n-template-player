@@ -6,8 +6,11 @@ import com.thehutgroup.accelerator.connectn.player.Player;
 import com.thehutgroup.accelerator.connectn.player.Position;
 
 import java.util.ArrayList;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
 
 
 public class FourSight extends Player {
@@ -25,6 +28,52 @@ public class FourSight extends Player {
     }
     return moves;
   }
+
+  public int findOptimalMove(Board board, UtilityFunctions evaluateBoard) {
+
+    int bestMove = 4;
+    int bestScore = Integer.MIN_VALUE;
+    for (int validMove : findValidMovesColumns(board)){
+      int newScore = miniMax(board, 15, true, evaluateBoard, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+      if (bestScore < newScore){
+        bestScore = newScore;
+        bestMove = validMove;
+      }
+    }
+    return bestMove;
+  }
+  public int miniMax(Board board, int depth, boolean isMax, UtilityFunctions evaluateBoard, Counter counter, int alpha, int beta) {
+    if (depth == 0) {
+      return evaluateBoard(board);
+    }
+
+    if (isMax) {
+      int maxEval = Integer.MIN_VALUE;
+      for (int validMove : findValidMovesColumns(board)) {
+        Board tempBoard = simulateMove(board, validMove);
+        int eval = miniMax(tempBoard, depth - 1, false, evaluateBoard, counter, alpha, beta);
+        maxEval = Math.max(maxEval, eval);
+        alpha = Math.max(alpha, eval);
+        if (beta <= alpha) {
+          break;  // Beta cut-off
+        }
+      }
+      return maxEval;
+    } else {
+      int minEval = Integer.MAX_VALUE;
+      for (int validMove : findValidMovesColumns(board)) {
+        Board tempBoard = simulateMove(board, validMove);
+        int eval = miniMax(tempBoard, depth - 1, true, evaluateBoard, counter.getOther(), alpha, beta);
+        minEval = Math.min(minEval, eval);
+        beta = Math.min(beta, eval);
+        if (beta <= alpha) {
+          break;  // Alpha cut-off
+        }
+      }
+      return minEval;
+    }
+  }
+
 
 
   @Override

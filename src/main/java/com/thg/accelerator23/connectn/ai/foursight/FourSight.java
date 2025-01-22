@@ -41,7 +41,7 @@ public class FourSight extends Player {
   public int findOptimalMove(Board board) throws InvalidMoveException {
 
     int bestMove = 4;
-    int bestScore = Integer.MIN_VALUE;
+    int bestScore = 1;
     for (int validMove : findValidMovesColumns(board)){
       int newScore = miniMax(board, 5, true, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
       if (bestScore < newScore){

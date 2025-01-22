@@ -1,9 +1,6 @@
 package com.thg.accelerator23.connectn.ai.foursight;
 
-import com.thehutgroup.accelerator.connectn.player.Board;
-import com.thehutgroup.accelerator.connectn.player.Counter;
-import com.thehutgroup.accelerator.connectn.player.Player;
-import com.thehutgroup.accelerator.connectn.player.Position;
+import com.thehutgroup.accelerator.connectn.player.*;
 
 import java.util.ArrayList;
 
@@ -42,15 +39,20 @@ public class FourSight extends Player {
     }
     return bestMove;
   }
-  public int miniMax(Board board, int depth, boolean isMax, UtilityFunctions evaluateBoard, Counter counter, int alpha, int beta) {
+
+  public static Board simulateMove(Board board, int Column, Counter counter){
+    int
+
+  }
+  public int miniMax(Board board, int depth, boolean isMax, UtilityFunctions evaluateBoard, Counter counter, int alpha, int beta) throws InvalidMoveException {
     if (depth == 0) {
-      return evaluateBoard(board);
+      return evaluateBoard(board, counter);
     }
 
     if (isMax) {
       int maxEval = Integer.MIN_VALUE;
       for (int validMove : findValidMovesColumns(board)) {
-        Board tempBoard = simulateMove(board, validMove);
+        Board tempBoard = new Board(board, validMove, counter);
         int eval = miniMax(tempBoard, depth - 1, false, evaluateBoard, counter, alpha, beta);
         maxEval = Math.max(maxEval, eval);
         alpha = Math.max(alpha, eval);
@@ -62,7 +64,7 @@ public class FourSight extends Player {
     } else {
       int minEval = Integer.MAX_VALUE;
       for (int validMove : findValidMovesColumns(board)) {
-        Board tempBoard = simulateMove(board, validMove);
+        Board tempBoard = new Board(board, validMove, counter.getOther());
         int eval = miniMax(tempBoard, depth - 1, true, evaluateBoard, counter.getOther(), alpha, beta);
         minEval = Math.min(minEval, eval);
         beta = Math.min(beta, eval);

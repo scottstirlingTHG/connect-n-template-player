@@ -23,16 +23,21 @@ public class UtilityFunctions {
         default -> 0;
     };
 
-
+    private static int centralColumnBias(Position position, Board board) {
+        int centerColumn = board.getConfig().getWidth() / 2;  // Central column (0-indexed)
+        return position.getX() == centerColumn ? 15 : 0; // Add 15 points if it's in the central column
+    }
 
     public static int evaluateBoard(Board board, Counter counter) {
         int score = 0;
         for (int i = 0; i <= board.getConfig().getWidth(); i++) {
             for (int j = 0; j <= board.getConfig().getHeight(); j++) {
-                score += evaluateHorizontal(board, new Position(i, j), counter)
-                        + evaluateVertical(board, new Position(i, j), counter)
-                        + evaluateRightDiagonal(board, new Position(i, j), counter)
-                        + evaluateLeftDiagonal(board, new Position(i, j), counter);
+                Position position = new Position(i, j);
+                score += evaluateHorizontal(board, position, counter)
+                        + evaluateVertical(board, position, counter)
+                        + evaluateRightDiagonal(board, position, counter)
+                        + evaluateLeftDiagonal(board, position, counter)
+                        + centralColumnBias(position, board);
             }
         }
         return score;

@@ -40,7 +40,7 @@ public class UtilityFunctions {
 
     public static int evaluateHorizontal(Board board, Position position, Counter counter) {
         if (position.getX() < board.getConfig().getWidth() - 4
-                && board.getCounterAtPosition(position).equals(counter)){
+                && board.getCounterAtPosition(position) == counter){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())) == counter){
                 count++;
@@ -53,7 +53,7 @@ public class UtilityFunctions {
 
     public static int evaluateVertical(Board board, Position position, Counter counter) {
         if (position.getX() < board.getConfig().getHeight() - 4
-                && board.getCounterAtPosition(position).equals(counter)){
+                && board.getCounterAtPosition(position) == counter){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() , position.getY() + count)) == counter){
                 count++;
@@ -66,7 +66,7 @@ public class UtilityFunctions {
     public static int evaluateRightDiagonal(Board board, Position position, Counter counter) {
         if (position.getX() < board.getConfig().getWidth() - 4
                 && position.getY() < board.getConfig().getHeight() - 4
-                && board.getCounterAtPosition(position).equals(counter)){
+                && board.getCounterAtPosition(position) ==counter ){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count , position.getY()+ count)) == counter){
                 count++;
@@ -79,7 +79,7 @@ public class UtilityFunctions {
     public static int evaluateLeftDiagonal(Board board, Position position, Counter counter) {
         if (position.getX() >= 3
                 && position.getY() < board.getConfig().getHeight() - 4
-                && board.getCounterAtPosition(position).getStringRepresentation().equals(counter.getStringRepresentation())){
+                && board.getCounterAtPosition(position) == counter){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() - count , position.getY()+ count)) == counter){
                 count++;

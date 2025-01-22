@@ -42,7 +42,7 @@ public class UtilityFunctions {
         if (position.getX() < board.getConfig().getWidth() - 4
                 && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
-            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())).equals(counter)){
+            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())) == counter){
                 count++;
             }
             return countToScore.apply(count);
@@ -55,7 +55,7 @@ public class UtilityFunctions {
         if (position.getX() < board.getConfig().getHeight() - 4
                 && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
-            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() , position.getY() + count)).equals(counter)){
+            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() , position.getY() + count)) == counter){
                 count++;
             }
             return countToScore.apply(count);
@@ -68,7 +68,7 @@ public class UtilityFunctions {
                 && position.getY() < board.getConfig().getHeight() - 4
                 && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
-            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count , position.getY()+ count)).equals(counter)){
+            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count , position.getY()+ count)) == counter){
                 count++;
             }
             return countToScore.apply(count);
@@ -81,7 +81,7 @@ public class UtilityFunctions {
                 && position.getY() < board.getConfig().getHeight() - 4
                 && board.getCounterAtPosition(position).getStringRepresentation().equals(counter.getStringRepresentation())){
             int count = 1;
-            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() - count , position.getY()+ count)).equals(counter)){
+            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() - count , position.getY()+ count)) == counter){
                 count++;
             }
             return countToScore.apply(count);

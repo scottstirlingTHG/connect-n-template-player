@@ -15,20 +15,12 @@ public class UtilityFunctions {
 
 
 
-    public static Function<Integer, Integer>  countToScore = count ->{
-        if (count == 1){
-            return 1;
-        }
-        if (count == 2){
-            return 20;
-        }
-        if (count == 3){
-            return 60;
-        }
-        if (count ==  4){
-            return 1000000000;
-        }
-        return 0;
+    public static Function<Integer, Integer> countToScore = count -> switch (count) {
+        case 1 -> 10;  // low score for 1-in-a-row, but it's a potential starting point
+        case 2 -> 50;  // stronger for 2-in-a-row, it's becoming a real threat
+        case 3 -> 500; // even stronger for 3-in-a-row, close to winning
+        case 4 -> 10000;  // large score for 4-in-a-row, actual win
+        default -> 0;
     };
 
 

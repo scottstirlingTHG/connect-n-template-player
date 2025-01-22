@@ -11,9 +11,9 @@ import java.util.function.Predicate;
 
 public class UtilityFunctions {
 
-
-
-
+    public static int horizontalWeight = 1;  // Default value
+    public static int verticalWeight = 1;    // Default value
+    public static int diagonalWeight = 1;
 
     public static Function<Integer, Integer>  countToScore = count ->{
         if (count == 1){
@@ -53,7 +53,7 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())).getStringRepresentation().equals(counter.getStringRepresentation())){
                 count++;
             }
-            return countToScore.apply(count);
+            return countToScore.apply(count) * horizontalWeight;
         }
         return 0;
     }
@@ -66,7 +66,7 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() , position.getY() + count)).equals(counter)){
                 count++;
             }
-            return countToScore.apply(count);
+            return countToScore.apply(count) * verticalWeight;
         }
         return 0;
     }
@@ -79,7 +79,7 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count , position.getY()+ count)).equals(counter)){
                 count++;
             }
-            return countToScore.apply(count);
+            return countToScore.apply(count)* diagonalWeight;
         }
         return 0;
     }
@@ -92,7 +92,7 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() - count , position.getY()+ count)).equals(counter)){
                 count++;
             }
-            return countToScore.apply(count);
+            return countToScore.apply(count)*diagonalWeight;
         }
         return 0;
     }

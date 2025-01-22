@@ -53,7 +53,7 @@ public class UtilityFunctions {
 
     public static int evaluateVertical(Board board, Position position, Counter counter) {
         if (position.getX() < board.getConfig().getHeight() - 4
-                && board.getCounterAtPosition(position).getStringRepresentation().equals(counter.getStringRepresentation())){
+                && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() , position.getY() + count)).equals(counter)){
                 count++;
@@ -66,7 +66,7 @@ public class UtilityFunctions {
     public static int evaluateRightDiagonal(Board board, Position position, Counter counter) {
         if (position.getX() < board.getConfig().getWidth() - 4
                 && position.getY() < board.getConfig().getHeight() - 4
-                && board.getCounterAtPosition(position).getStringRepresentation().equals(counter.getStringRepresentation())){
+                && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count , position.getY()+ count)).equals(counter)){
                 count++;

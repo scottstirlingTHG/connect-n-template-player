@@ -4,16 +4,26 @@ import com.thehutgroup.accelerator.connectn.player.*;
 
 import java.util.ArrayList;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
+
 
 
 public class FourSight extends Player {
   public FourSight(Counter counter) {
     //TODO: fill in your name here
     super(counter, FourSight.class.getName());
+  }
+
+  @Override
+  public int makeMove(Board board) {
+    //TODO: some crazy analysis
+    try {
+      return this.findOptimalMove(board);
+    } catch (InvalidMoveException e)  {
+      return 4 ;
+    }
+    //TODO: make sure said analysis uses less than 2G of heap and returns within 10 seconds on whichever machine is running it
+
   }
 
   public List<Integer> findValidMovesColumns(Board board) {
@@ -28,7 +38,7 @@ public class FourSight extends Player {
 
 
 
-  public int findOptimalMove(Board board, UtilityFunctions evaluateBoard) throws InvalidMoveException {
+  public int findOptimalMove(Board board) throws InvalidMoveException {
 
     int bestMove = 4;
     int bestScore = Integer.MIN_VALUE;
@@ -75,15 +85,4 @@ public class FourSight extends Player {
     }
   }
 
-
-
-  @Override
-  public int makeMove(Board board) {
-    //TODO: some crazy analysis
-    List<Integer> moves = findValidMovesColumns(board);
-    Random rand = new Random();
-    return moves.get(rand.nextInt(moves.size()));
-    //TODO: make sure said analysis uses less than 2G of heap and returns within 10 seconds on whichever machine is running it
-
-  }
 }

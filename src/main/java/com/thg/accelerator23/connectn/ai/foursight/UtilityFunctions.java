@@ -20,13 +20,13 @@ public class UtilityFunctions {
             return 1;
         }
         if (count == 2){
-            return 30;
+            return 20;
         }
         if (count == 3){
-            return 100;
+            return 60;
         }
         if (count ==  4){
-            return 100000;
+            return 1000000000;
         }
         return 0;
     };
@@ -35,8 +35,8 @@ public class UtilityFunctions {
 
     public static int evaluateBoard(Board board, Counter counter) {
         int score = 0;
-        for (int i = 0; i < board.getConfig().getWidth(); i++) {
-            for (int j = 0; j < board.getConfig().getHeight(); j++) {
+        for (int i = 0; i < board.getConfig().getWidth() - 4; i++) {
+            for (int j = 0; j < board.getConfig().getHeight()- 4; j++) {
                 score += evaluateHorizontal(board, new Position(i, j), counter)
                         + evaluateVertical(board, new Position(i, j), counter)
                         + evaluateRightDiagonal(board, new Position(i, j), counter)
@@ -50,7 +50,7 @@ public class UtilityFunctions {
         if (position.getX() < board.getConfig().getWidth() - 4
                 && board.getCounterAtPosition(position).equals(counter)){
             int count = 1;
-            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())).getStringRepresentation().equals(counter.getStringRepresentation())){
+            while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())).equals(counter)){
                 count++;
             }
             return countToScore.apply(count);

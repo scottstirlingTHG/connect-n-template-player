@@ -18,6 +18,15 @@ public class UtilityFunctions {
         default -> 0;
     };
 
+    // Opponent scores are weighted higher to prioritize blocking
+    public static Function<Integer, Integer> opponentCountToScore = count -> switch (count) {
+        case 1 -> 15;    // Slightly higher than own 1-in-row
+        case 2 -> 75;    // Higher priority for blocking 2-in-row
+        case 3 -> 1000;  // Much higher priority for blocking 3-in-row
+        case 4 -> 20000; // Highest priority - must block win
+        default -> 0;
+    };
+
     private static int centralColumnBias(Position position, Board board) {
         int centerColumn = board.getConfig().getWidth() / 2;
         return position.getX() == centerColumn ? 15 : 0;
@@ -28,16 +37,9 @@ public class UtilityFunctions {
         for (int i = 0; i < board.getConfig().getWidth(); i++) {
             for (int j = 0; j < board.getConfig().getHeight(); j++) {
                 Position position = new Position(i, j);
-                int myScore = evaluateHorizontal(board, position, counter)
-                        + evaluateVertical(board, position, counter)
-                        + evaluateRightDiagonal(board, position, counter)
-                        + evaluateLeftDiagonal(board, position, counter)
-                        + centralColumnBias(position, board);
 
-                int opponentScore = evaluateHorizontal(board, position, counter.getOther())
-                        + evaluateVertical(board, position, counter.getOther())
-                        + evaluateRightDiagonal(board, position, counter.getOther())
-                        + evaluateLeftDiagonal(board, position, counter.getOther());
+                int myScore = evaluatePosition(board, position, counter, countToScore);
+                int opponentScore = evaluatePosition(board, position, counter.getOther(), opponentCountToScore);
 
                 score += myScore - opponentScore;
             }
@@ -45,31 +47,39 @@ public class UtilityFunctions {
         return score;
     }
 
-    public static int evaluateHorizontal(Board board, Position position, Counter counter) {
+    private static int evaluatePosition(Board board, Position position, Counter counter, Function<Integer, Integer> scoreFunction) {
+        return evaluateHorizontal(board, position, counter, scoreFunction)
+                + evaluateVertical(board, position, counter, scoreFunction)
+                + evaluateRightDiagonal(board, position, counter, scoreFunction)
+                + evaluateLeftDiagonal(board, position, counter, scoreFunction)
+                + (counter == counter ? centralColumnBias(position, board) : 0);
+    }
+
+    public static int evaluateHorizontal(Board board, Position position, Counter counter, Function<Integer, Integer> scoreFunction) {
         if (position.getX() < board.getConfig().getWidth() - 3
                 && board.getCounterAtPosition(position) == counter) {
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY())) == counter) {
                 count++;
             }
-            return countToScore.apply(count);
+            return scoreFunction.apply(count);
         }
         return 0;
     }
 
-    public static int evaluateVertical(Board board, Position position, Counter counter) {
+    public static int evaluateVertical(Board board, Position position, Counter counter, Function<Integer, Integer> scoreFunction) {
         if (position.getY() < board.getConfig().getHeight() - 3
                 && board.getCounterAtPosition(position) == counter) {
             int count = 1;
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX(), position.getY() + count)) == counter) {
                 count++;
             }
-            return countToScore.apply(count);
+            return scoreFunction.apply(count);
         }
         return 0;
     }
 
-    public static int evaluateRightDiagonal(Board board, Position position, Counter counter) {
+    public static int evaluateRightDiagonal(Board board, Position position, Counter counter, Function<Integer, Integer> scoreFunction) {
         if (position.getX() < board.getConfig().getWidth() - 3
                 && position.getY() < board.getConfig().getHeight() - 3
                 && board.getCounterAtPosition(position) == counter) {
@@ -77,12 +87,12 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() + count, position.getY() + count)) == counter) {
                 count++;
             }
-            return countToScore.apply(count);
+            return scoreFunction.apply(count);
         }
         return 0;
     }
 
-    public static int evaluateLeftDiagonal(Board board, Position position, Counter counter) {
+    public static int evaluateLeftDiagonal(Board board, Position position, Counter counter, Function<Integer, Integer> scoreFunction) {
         if (position.getX() >= 3
                 && position.getY() < board.getConfig().getHeight() - 3
                 && board.getCounterAtPosition(position) == counter) {
@@ -90,7 +100,7 @@ public class UtilityFunctions {
             while (count < 4 && board.getCounterAtPosition(new Position(position.getX() - count, position.getY() + count)) == counter) {
                 count++;
             }
-            return countToScore.apply(count);
+            return scoreFunction.apply(count);
         }
         return 0;
     }

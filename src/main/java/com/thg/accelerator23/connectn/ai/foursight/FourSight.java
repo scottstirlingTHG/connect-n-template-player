@@ -43,7 +43,7 @@ public class FourSight extends Player {
     int bestMove = 4;
     int bestScore = Integer.MIN_VALUE;
     for (int validMove : findValidMovesColumns(board)){
-      int newScore = miniMax(board, 16, true, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+      int newScore = miniMax(board, 5, true, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
       if (bestScore < newScore){
         bestScore = newScore;
         bestMove = validMove;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
+import java.util.concurrent.CompletableFuture;
 
 
 public class FourSight extends Player {
@@ -19,19 +19,21 @@ public class FourSight extends Player {
   public List<Integer> findValidMovesColumns(Board board) {
     List<Integer> moves = new ArrayList<>();
     for (int i = 0; i < board.getConfig().getWidth(); i++){
-      if (board.getCounterAtPosition(new Position(i, board.getConfig().getHeight() -1 )) == null){
+      if (board.getCounterAtPosition(new Position(i, board.getConfig().getHeight() - 1 )) == null){
         moves.add(i);
       }
     }
     return moves;
   }
 
-  public int findOptimalMove(Board board, UtilityFunctions evaluateBoard) {
+
+
+  public int findOptimalMove(Board board, UtilityFunctions evaluateBoard) throws InvalidMoveException {
 
     int bestMove = 4;
     int bestScore = Integer.MIN_VALUE;
     for (int validMove : findValidMovesColumns(board)){
-      int newScore = miniMax(board, 15, true, evaluateBoard, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+      int newScore = miniMax(board, 16, true, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
       if (bestScore < newScore){
         bestScore = newScore;
         bestMove = validMove;
@@ -40,20 +42,17 @@ public class FourSight extends Player {
     return bestMove;
   }
 
-  public static Board simulateMove(Board board, int Column, Counter counter){
-    int
 
-  }
-  public int miniMax(Board board, int depth, boolean isMax, UtilityFunctions evaluateBoard, Counter counter, int alpha, int beta) throws InvalidMoveException {
+  public int miniMax(Board board, int depth, boolean isMax, Counter counter, int alpha, int beta) throws InvalidMoveException {
     if (depth == 0) {
-      return evaluateBoard(board, counter);
+      return UtilityFunctions.evaluateBoard(board, counter);
     }
 
     if (isMax) {
       int maxEval = Integer.MIN_VALUE;
       for (int validMove : findValidMovesColumns(board)) {
         Board tempBoard = new Board(board, validMove, counter);
-        int eval = miniMax(tempBoard, depth - 1, false, evaluateBoard, counter, alpha, beta);
+        int eval = miniMax(tempBoard, depth - 1, false, counter, alpha, beta);
         maxEval = Math.max(maxEval, eval);
         alpha = Math.max(alpha, eval);
         if (beta <= alpha) {
@@ -65,7 +64,7 @@ public class FourSight extends Player {
       int minEval = Integer.MAX_VALUE;
       for (int validMove : findValidMovesColumns(board)) {
         Board tempBoard = new Board(board, validMove, counter.getOther());
-        int eval = miniMax(tempBoard, depth - 1, true, evaluateBoard, counter.getOther(), alpha, beta);
+        int eval = miniMax(tempBoard, depth - 1, true, counter.getOther(), alpha, beta);
         minEval = Math.min(minEval, eval);
         beta = Math.min(beta, eval);
         if (beta <= alpha) {

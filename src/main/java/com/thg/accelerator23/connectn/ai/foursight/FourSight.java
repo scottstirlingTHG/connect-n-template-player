@@ -3,10 +3,8 @@ package com.thg.accelerator23.connectn.ai.foursight;
 import com.thehutgroup.accelerator.connectn.player.*;
 
 import java.util.ArrayList;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 
 public class FourSight extends Player {
@@ -26,6 +24,20 @@ public class FourSight extends Player {
     }
   }
 
+  public List<Integer> getAvailableCounterLocations(Counter[][] counterLocations){
+    List<Integer> validLocations = new ArrayList<>();
+    OuterLoop:
+    for (int i = 0; i < counterLocations[0].length; i++) {
+        for (Counter[] counterLocation : counterLocations) {
+            if (counterLocation[i] == null) {
+                validLocations.add(i);
+                continue OuterLoop;
+            }
+        }
+    }
+    return validLocations;
+  }
+
   public List<Integer> findValidMovesColumns(Board board) {
     List<Integer> moves = new ArrayList<>();
     for (int i = 0; i < board.getConfig().getWidth(); i++) {
@@ -36,14 +48,36 @@ public class FourSight extends Player {
     return moves;
   }
 
+  public static void addToColumn(Counter[][] counterLocations, int column, Counter counter) {
+    for (int i = 0; i < counterLocations.length; i++) {
+      if (counterLocations[i][column] == null) {
+        counterLocations[i][column] = counter;
+        break;
+      }
+    }
+  }
+
+  public static void removeFromColumn(Counter[][] counterLocations, int column) {
+    for (int i = counterLocations.length - 1; i > -1; i--) {
+      if (counterLocations[i][column] != null) {
+        counterLocations[i][column] = null;
+        break;
+      }
+    }
+  }
+
   public int findOptimalMove(Board board) throws InvalidMoveException {
-    Map<String, Integer> transpositionTable = new HashMap<>();
-    int bestMove = findValidMovesColumns(board).get(0);
+    Counter[][] counterLocations = board.getCounterPlacements();
+    List<Integer> availableCounterLocations = getAvailableCounterLocations(counterLocations);
+    int bestMove = availableCounterLocations.get(0);
     int bestScore = Integer.MIN_VALUE;
 
-    for (int validMove : findValidMovesColumns(board)) {
-      Board tempBoard = new Board(board, validMove, this.getCounter());
-      int newScore = miniMax(tempBoard, 7, false, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE, transpositionTable);
+    for (int validMove : availableCounterLocations) {
+
+        FourSight.addToColumn(counterLocations, validMove, this.getCounter());
+
+        int newScore = miniMax(counterLocations, 7, false, this.getCounter().getOther(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+        FourSight.removeFromColumn(counterLocations, validMove);
       if (bestScore < newScore) {
         bestScore = newScore;
         bestMove = validMove;
@@ -52,29 +86,23 @@ public class FourSight extends Player {
     return bestMove;
   }
 
-  public int miniMax(Board board, int depth, boolean isMax, Counter originalCounter, int alpha, int beta, Map<String, Integer> transpositionTable) throws InvalidMoveException {
-    // Check transposition table
-    String boardKey = board.toString() + "_" + depth + "_" + (isMax ? "max" : "min");
-    if (transpositionTable.containsKey(boardKey)) {
-      return transpositionTable.get(boardKey);
-    }
+  public int miniMax(Counter[][] counterLocations, int depth, boolean isMax, Counter originalCounter, int alpha, int beta) throws InvalidMoveException {
 
     if (depth == 0) {
-      int evaluation = UtilityFunctions.evaluateBoard(board, originalCounter);
-      transpositionTable.put(boardKey, evaluation);
-      return evaluation;
+        return UtilityFunctions.evaluateBoard(counterLocations, originalCounter);
     }
 
     int bestEval = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-    for (int validMove : findValidMovesColumns(board)) {
-      Board tempBoard = new Board(board, validMove,
-              isMax ? originalCounter : originalCounter.getOther());
+    for (int validMove : getAvailableCounterLocations(counterLocations)) {
+      FourSight.addToColumn(counterLocations, validMove, originalCounter);
 
-      int eval = miniMax(tempBoard, depth - 1, !isMax, originalCounter, alpha, beta, transpositionTable);
+      int eval = miniMax(counterLocations, depth - 1, !isMax, originalCounter.getOther(), alpha, beta);
+      FourSight.removeFromColumn(counterLocations, validMove);
 
       bestEval = isMax ?
               Math.max(bestEval, eval) :
               Math.min(bestEval, eval);
+
 
       if (isMax) {
         alpha = Math.max(alpha, eval);
@@ -87,8 +115,6 @@ public class FourSight extends Player {
       }
     }
 
-    // Cache the result
-    transpositionTable.put(boardKey, bestEval);
     return bestEval;
   }
 }

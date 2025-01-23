@@ -4,11 +4,15 @@ import com.thehutgroup.accelerator.connectn.player.*;
 
 import java.util.ArrayList;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class FourSight extends Player {
+
+
+
   public FourSight(Counter counter) {
     super(counter, FourSight.class.getName());
   }
@@ -33,12 +37,13 @@ public class FourSight extends Player {
   }
 
   public int findOptimalMove(Board board) throws InvalidMoveException {
+    Map<String, Integer> transpositionTable = new HashMap<>();
     int bestMove = findValidMovesColumns(board).get(0);
     int bestScore = Integer.MIN_VALUE;
 
     for (int validMove : findValidMovesColumns(board)) {
       Board tempBoard = new Board(board, validMove, this.getCounter());
-      int newScore = miniMax(tempBoard, 6, false, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE);
+      int newScore = miniMax(tempBoard, 7, false, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE, transpositionTable);
       if (bestScore < newScore) {
         bestScore = newScore;
         bestMove = validMove;
@@ -47,35 +52,43 @@ public class FourSight extends Player {
     return bestMove;
   }
 
-  public int miniMax(Board board, int depth, boolean isMax, Counter originalCounter, int alpha, int beta) throws InvalidMoveException {
-    if (depth == 0) {
-      return UtilityFunctions.evaluateBoard(board, originalCounter);
+  public int miniMax(Board board, int depth, boolean isMax, Counter originalCounter, int alpha, int beta, Map<String, Integer> transpositionTable) throws InvalidMoveException {
+    // Check transposition table
+    String boardKey = board.toString() + "_" + depth + "_" + (isMax ? "max" : "min");
+    if (transpositionTable.containsKey(boardKey)) {
+      return transpositionTable.get(boardKey);
     }
 
-    if (isMax) {
-      int maxEval = Integer.MIN_VALUE;
-      for (int validMove : findValidMovesColumns(board)) {
-        Board tempBoard = new Board(board, validMove, originalCounter);
-        int eval = miniMax(tempBoard, depth - 1, false, originalCounter, alpha, beta);
-        maxEval = Math.max(maxEval, eval);
-        alpha = Math.max(alpha, eval);
-        if (beta <= alpha) {
-          break;
-        }
-      }
-      return maxEval;
-    } else {
-      int minEval = Integer.MAX_VALUE;
-      for (int validMove : findValidMovesColumns(board)) {
-        Board tempBoard = new Board(board, validMove, originalCounter.getOther());
-        int eval = miniMax(tempBoard, depth - 1, true, originalCounter, alpha, beta);
-        minEval = Math.min(minEval, eval);
-        beta = Math.min(beta, eval);
-        if (beta <= alpha) {
-          break;
-        }
-      }
-      return minEval;
+    if (depth == 0) {
+      int evaluation = UtilityFunctions.evaluateBoard(board, originalCounter);
+      transpositionTable.put(boardKey, evaluation);
+      return evaluation;
     }
+
+    int bestEval = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+    for (int validMove : findValidMovesColumns(board)) {
+      Board tempBoard = new Board(board, validMove,
+              isMax ? originalCounter : originalCounter.getOther());
+
+      int eval = miniMax(tempBoard, depth - 1, !isMax, originalCounter, alpha, beta, transpositionTable);
+
+      bestEval = isMax ?
+              Math.max(bestEval, eval) :
+              Math.min(bestEval, eval);
+
+      if (isMax) {
+        alpha = Math.max(alpha, eval);
+      } else {
+        beta = Math.min(beta, eval);
+      }
+
+      if (beta <= alpha) {
+        break;
+      }
+    }
+
+    // Cache the result
+    transpositionTable.put(boardKey, bestEval);
+    return bestEval;
   }
 }

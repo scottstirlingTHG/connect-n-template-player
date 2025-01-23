@@ -26,14 +26,10 @@ public class FourSight extends Player {
 
   public List<Integer> getAvailableCounterLocations(Counter[][] counterLocations){
     List<Integer> validLocations = new ArrayList<>();
-    OuterLoop:
     for (int i = 0; i < counterLocations[0].length; i++) {
-        for (Counter[] counterLocation : counterLocations) {
-            if (counterLocation[i] == null) {
-                validLocations.add(i);
-                continue OuterLoop;
-            }
-        }
+         if (counterLocations[counterLocations.length-1][i] == null){
+           validLocations.add(i);
+       }
     }
     return validLocations;
   }
@@ -75,7 +71,6 @@ public class FourSight extends Player {
     for (int validMove : availableCounterLocations) {
 
         FourSight.addToColumn(counterLocations, validMove, this.getCounter());
-
         int newScore = miniMax(counterLocations, 7, false, this.getCounter().getOther(), Integer.MIN_VALUE, Integer.MAX_VALUE);
         FourSight.removeFromColumn(counterLocations, validMove);
       if (bestScore < newScore) {

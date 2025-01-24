@@ -2,11 +2,9 @@ package com.thg.accelerator23.connectn.ai.foursight;
 
 import com.thehutgroup.accelerator.connectn.player.*;
 
-import java.util.ArrayList;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.GenericDeclaration;
+import java.sql.Timestamp;
+import java.util.*;
 
 
 public class FourSight extends Player {
@@ -37,18 +35,20 @@ public class FourSight extends Player {
   }
 
   public int findOptimalMove(Board board) throws InvalidMoveException {
+
     Map<String, Integer> transpositionTable = new HashMap<>();
     int bestMove = findValidMovesColumns(board).get(0);
     int bestScore = Integer.MIN_VALUE;
 
     for (int validMove : findValidMovesColumns(board)) {
       Board tempBoard = new Board(board, validMove, this.getCounter());
-      int newScore = miniMax(tempBoard, 7, false, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE, transpositionTable);
+      int newScore = miniMax(tempBoard, 5, false, this.getCounter(), Integer.MIN_VALUE, Integer.MAX_VALUE, transpositionTable);
       if (bestScore < newScore) {
         bestScore = newScore;
         bestMove = validMove;
       }
     }
+    Timestamp end = new Timestamp(System.currentTimeMillis());
     return bestMove;
   }
 

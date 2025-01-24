@@ -17,52 +17,39 @@ public class FourSight extends Player {
 
   @Override
   public int makeMove(Board board) {
-    try {
-      return findOptimalMove(board);
-    } catch (InvalidMoveException e) {
-      return findValidMovesColumns(board).get(0);
-    }
+    return findOptimalMove(board);
   }
 
   public List<Integer> getAvailableCounterLocations(Counter[][] counterLocations){
     List<Integer> validLocations = new ArrayList<>();
-    for (int i = 0; i < counterLocations[0].length; i++) {
-         if (counterLocations[counterLocations.length-1][i] == null){
+    for (int i = 0; i < counterLocations.length; i++) {
+         if (counterLocations[i][counterLocations[0].length-1] == null){
            validLocations.add(i);
        }
     }
     return validLocations;
   }
 
-  public List<Integer> findValidMovesColumns(Board board) {
-    List<Integer> moves = new ArrayList<>();
-    for (int i = 0; i < board.getConfig().getWidth(); i++) {
-      if (board.getCounterAtPosition(new Position(i, board.getConfig().getHeight() - 1)) == null) {
-        moves.add(i);
-      }
-    }
-    return moves;
-  }
 
   public static void addToColumn(Counter[][] counterLocations, int column, Counter counter) {
-    for (int i = 0; i < counterLocations.length; i++) {
-      if (counterLocations[i][column] == null) {
-        counterLocations[i][column] = counter;
+    for (int i = 0; i < counterLocations[0].length; i++) {
+      if (counterLocations[column][i] == null) {
+        counterLocations[column][i] = counter;
         break;
       }
     }
   }
 
   public static void removeFromColumn(Counter[][] counterLocations, int column) {
-    for (int i = counterLocations.length - 1; i > -1; i--) {
-      if (counterLocations[i][column] != null) {
-        counterLocations[i][column] = null;
+    for (int i = counterLocations[0].length - 1; i > -1; i--) {
+      if (counterLocations[column][i] != null) {
+        counterLocations[column][i] = null;
         break;
       }
     }
   }
 
-  public int findOptimalMove(Board board) throws InvalidMoveException {
+  public int findOptimalMove(Board board) {
     Counter[][] counterLocations = board.getCounterPlacements();
     List<Integer> availableCounterLocations = getAvailableCounterLocations(counterLocations);
     int bestMove = availableCounterLocations.get(0);
@@ -76,12 +63,13 @@ public class FourSight extends Player {
       if (bestScore < newScore) {
         bestScore = newScore;
         bestMove = validMove;
+
       }
     }
     return bestMove;
   }
 
-  public int miniMax(Counter[][] counterLocations, int depth, boolean isMax, Counter originalCounter, int alpha, int beta) throws InvalidMoveException {
+  public int miniMax(Counter[][] counterLocations, int depth, boolean isMax, Counter originalCounter, int alpha, int beta) {
 
     if (depth == 0) {
         return UtilityFunctions.evaluateBoard(counterLocations, originalCounter);
@@ -89,15 +77,14 @@ public class FourSight extends Player {
 
     int bestEval = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
     for (int validMove : getAvailableCounterLocations(counterLocations)) {
-      FourSight.addToColumn(counterLocations, validMove, originalCounter);
 
+      FourSight.addToColumn(counterLocations, validMove, originalCounter);
       int eval = miniMax(counterLocations, depth - 1, !isMax, originalCounter.getOther(), alpha, beta);
       FourSight.removeFromColumn(counterLocations, validMove);
-
+      System.out.println(isMax);
       bestEval = isMax ?
               Math.max(bestEval, eval) :
               Math.min(bestEval, eval);
-
 
       if (isMax) {
         alpha = Math.max(alpha, eval);
@@ -109,7 +96,7 @@ public class FourSight extends Player {
         break;
       }
     }
-
+    System.out.println("Best move: " + bestEval);
     return bestEval;
   }
 }
